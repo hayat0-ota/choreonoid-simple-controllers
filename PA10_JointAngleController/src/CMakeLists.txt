@@ -1,0 +1,1 @@
+choreonoid_add_simple_controller(PA10_JointAngleController PA10_JointAngleController.cpp)
