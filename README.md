@@ -3,9 +3,11 @@ SimpleControllers for Choreonoid.
 
 # Usage
 clone this repository in `choreonoid/ext` folder.
+Don't forget `choreonoid/ext/CMakeLists.txt` before clone.
 
 ```bash
 $ cd choreonoid/ext
+$ rm CMakeLists.txt
 $ git clone (this-repository-url) .
 ```
 
