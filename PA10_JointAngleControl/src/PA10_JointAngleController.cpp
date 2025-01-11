@@ -1,41 +1,51 @@
 #include <cnoid/SimpleController>
 #include <random>
 
-/// @brief ある関節指令値に動かす
+#pragma region Declaration
+
+/// @brief Give joint angle to each joint of PA10
 class PA10_JointAngleController : public cnoid::SimpleController
 {
 private:
-    /// @brief 軸数
+    /// @brief The number of joint
     static const int jointNum = 9;
+
+    /// @brief  The number of pattern
+    static const int patternNum = 4;
 
     /// @brief Joint limits of PA10 model
     const float JointLimit[jointNum] = {177.0, 94.0,  174.0, 137.0, 255.0,
                                         165.0, 255.0, 0.030, 0.030};
 
-    /// @brief 角度パターン一覧（計4パターン）
-    float anglePattern[4][jointNum];
+    /// @brief Pattern of joint angles
+    float anglePattern[patternNum][jointNum];
 
-    /// @brief Bodyファイルのアクセスポインタ
+    /// @brief Pointer for Body
     cnoid::BodyPtr ioBody;
 
-    /// @brief 現在時間
+    /// @brief Curremt simulation time [ms]
     double currentTime;
 
-    /// @brief シミュレーションステップ時間[ms]
+    /// @brief Simulation step time [ms]
     double timeStep;
 
+    /// Methods
     float generateRandomFloat(float min, float max);
     float deg2rad(float deg);
 
 public:
+    /// Methods
     PA10_JointAngleController();
     virtual bool initialize(cnoid::SimpleControllerIO* io) override;
     virtual bool control() override;
 };
-
 CNOID_IMPLEMENT_SIMPLE_CONTROLLER_FACTORY(PA10_JointAngleController)
 
-/// @brief Constructor
+#pragma endregion
+
+#pragma region Implementation
+
+/// @brief Constructor (Not Implemented)
 PA10_JointAngleController::PA10_JointAngleController() {}
 
 /// @brief Executed once at SimpleController launched
@@ -47,10 +57,14 @@ bool PA10_JointAngleController::initialize(cnoid::SimpleControllerIO* io)
     ioBody = io->body();
 
     // Configure each joint
-    for (int i = 0; i < jointNum; i++)
+    for (int jointId = 0; jointId < jointNum; jointId++)
     {
-        cnoid::Link* joint = ioBody->joint(i);
+        cnoid::Link* joint = ioBody->joint(jointId);
+
+        // Set the way to control joint
         joint->setActuationMode(cnoid::Link::JointAngle);
+
+        // Enable Input and Output for joint
         io->enableIO(joint);
     }
 
@@ -59,7 +73,7 @@ bool PA10_JointAngleController::initialize(cnoid::SimpleControllerIO* io)
 
     // Create joint angle patterns
     // Angle must be between joint limit.
-    for (int patternId = 0; patternId < 4; patternId++)
+    for (int patternId = 0; patternId < patternNum; patternId++)
     {
         for (int jointId = 0; jointId < jointNum; jointId++)
         {
@@ -92,10 +106,10 @@ bool PA10_JointAngleController::control()
         currentPatternIndex = 0;
 
     // Control angle of joint according to patten index
-    for (int i = 0; i < jointNum; i++)
+    for (int jointId = 0; jointId < jointNum; jointId++)
     {
         // Unit must be radian
-        ioBody->joint(i)->q_target() = deg2rad(anglePattern[currentPatternIndex][i]);
+        ioBody->joint(jointId)->q_target() = deg2rad(anglePattern[currentPatternIndex][jointId]);
     }
 
     // Calculate current time
@@ -104,10 +118,10 @@ bool PA10_JointAngleController::control()
     return true;
 }
 
-/// @brief 適当な値を生成する
-/// @param min 最小値
-/// @param max 最大値
-/// @return 適当に生成した値
+/// @brief Generate random float value
+/// @param min Minimum
+/// @param max Maximum
+/// @return Generated value
 float PA10_JointAngleController::generateRandomFloat(float min, float max)
 {
     if (min > max)
@@ -122,10 +136,12 @@ float PA10_JointAngleController::generateRandomFloat(float min, float max)
     return dis(gen);
 }
 
-/// @brief degreeからradianへの変換
-/// @param angle degreeでの角度
-/// @return radianでの角度
+/// @brief Convert from degree to radian
+/// @param angle Angle in degree
+/// @return Angle in radian
 float PA10_JointAngleController::deg2rad(float deg)
 {
     return deg * M_PI / 180.0f;
 }
+
+#pragma endregion
