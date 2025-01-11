@@ -50,13 +50,12 @@ items:
               name: "JointAngleController"
               plugin: Body
               class: SimpleControllerItem
-              is_selected: true
               data:
                 isNoDelayMode: false
                 controllerOptions: ""
                 controller: "PA10_JointAngleController"
                 base_directory: "Controller directory"
-                reloading: false
+                reloading: true
                 export_symbols: false
         -
           id: 4
@@ -136,7 +135,7 @@ views:
           isCurrent: true
           eye: [ 3, 1.5, 1.2 ]
           direction: [ -0.880451, -0.440225, -0.17609 ]
-          up: [ -0.1575, -0.0787498, 0.984374 ]
+          up: [ -0.1575, -0.0787497, 0.984374 ]
         -
           camera: [ System, Orthographic ]
           orthoHeight: 20
